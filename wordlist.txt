@@ -1,0 +1,243 @@
+    bunda
+    ayah
+    dad 
+    Dad 
+    Bunda 
+    Ayah 
+    Bunda 
+    paman
+    bibi
+    Paman 
+    Bibi
+    Uncle
+    Aunt
+    Bahasa Indonesia
+    Ayah
+    Ibu
+    Suami
+    Istri
+    Anak laki-laki
+    Anak perempuan
+    Sayang
+    Bapak
+    Emak
+    Saudara laki-laki
+    Saudara perempuan
+
+    Bahasa Jawa
+    Bapak
+    Ibu
+    Garwa
+    Bojo
+    Anak lanang
+    Anak wadon
+    Tresna
+    Rama
+    Simbok
+    Sedulur lanang
+    Sedulur wadon
+
+    Slang Indonesia
+    Bokap
+    Nyokap
+    Laki
+    Bini
+    Bocah cowok
+    Bocah cewek
+    Cinta
+    Pak
+    Mak
+    Abang
+    Neng
+
+    Bahasa Inggris
+    Father
+    Mother
+    Wife
+    Husband
+    Son
+    Daughter
+    Honey
+    Dad
+    Mom
+    Brother
+    Sister
+
+    Bahasa Sunda
+    Rama
+    Biang
+    Salaki
+    Pamajikan
+    Budak lalaki
+    Budak awéwé
+    Kacinta
+    Bapa
+    Indung
+    Dulur lalaki
+    Dulur awéwé
+
+    Bahasa Minang
+    Amai
+    Apak
+    Uda
+    Uni
+    Anak rajo
+    Anak puti
+    Sayang
+    Ayah
+    Ibu
+    Saudara
+
+    Bahasa Batak
+    Amang
+    Inang
+    Angkang
+    Ito
+    Anak par lalaki
+    Anak par boru
+    Holong
+    Bapa
+    Namboru
+    Lae
+
+    Bahasa Bali
+    Bapa
+    Meme
+    Laki
+    Luh
+    Anak Alit
+    Anak Putu
+    Tresna
+    Ratu
+    Nini
+    Ajik
+
+    Bahasa Jepang
+    Otosan
+    Okasan
+    Tsuma
+    Otto
+    Musuko
+    Musume
+    Aishiteru
+    Papa
+    Mama
+    Ani
+    Imoto
+
+    Bahasa Korea
+    Abeoji
+    Eomeoni
+    Anae
+    Nampyeon
+    Adeul
+    Ttal
+    Salanghae
+    Appa
+    Eomma
+    Hyung
+    Nuna
+
+    Bahasa Arab
+    Ab
+    Um
+    Zawj
+    Zawja
+    Ibn
+    Bint
+    Habibi
+    Baba
+    Mama
+    Akh
+    Ukht
+
+    Bahasa Mandarin
+    Fùqīn
+    Mǔqīn
+    Qīzi
+    Zhàngfū
+    Érzi
+    Nǚ'ér
+    Bàobèi
+    Bàba
+    Māma
+    Gēgē
+    Jiějiě
+
+    Bahasa Spanyol
+    Padre
+    Madre
+    Esposa
+    Esposo
+    Hijo
+    Hija
+    Cariño
+    Papá
+    Mamá
+    Hermano
+    Hermana
+
+    Bahasa Prancis
+    Père
+    Mère
+    Femme
+    Mari
+    Fils
+    Fille
+    Chéri
+    Papa
+    Maman
+    Frère
+    Sœur
+
+    Bahasa Jerman
+    Vater
+    Mutter
+    Ehefrau
+    Ehemann
+    Sohn
+    Tochter
+    Schatz
+    Papa
+    Mama
+    Bruder
+    Schwester
+
+    Bahasa Italia
+    Padre
+    Madre
+    Moglie
+    Marito
+    Figlio
+    Figlia
+    Amore
+    Papà
+    Mamma
+    Fratello
+    Sorella
+
+    Bahasa Rusia
+    Otets
+    Mat'
+    Zhena
+    Muzh
+    Syn
+    Doch'
+    Lyubov'
+    Papa
+    Mama
+    Brat
+    Sestra
+
+    Bahasa Portugis
+    Pai
+    Mãe
+    Esposa
+    Marido
+    Filho
+    Filha
+    Amor
+    Papai
+    Mamãe
+    Irmão
+    Irmã
