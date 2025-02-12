@@ -9,9 +9,11 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-
+from dotenv import load_dotenv
 
 app = FastAPI()
+
+load_dotenv()
 
 # Get the absolute path to the static and templates directories
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
@@ -23,12 +25,14 @@ app.mount("/assets", StaticFiles(directory=static_dir), name="assets")
 # Setup templates
 templates = Jinja2Templates(directory=templates_dir)
 
-ADB_PATH = r"C:\\Users\\Lutfizp\\Downloads\\androidkerja\\platform-tools\\adb.exe"
-OUTPUT_DIR = r"C:\\Users\\Lutfizp\\Downloads\\"
+# ADB_PATH = r"C:\\Users\\Lutfizp\\Downloads\\androidkerja\\platform-tools\\adb.exe"
+ADB_PATH = os.getenv("ADB_PATH")
+OUTPUT_DIR = os.getenv("OUTPUT_DIR")
 DB_PATH = os.path.join(OUTPUT_DIR, "device_data.db")
 
-REMOTE_HISTORY_FILE = "/data/data/com.android.chrome/app_chrome/Default/History"
-TEMP_HISTORY_FILE = "/sdcard/History.db"
+#REMOTE_HISTORY_FILE = "/data/data/com.android.chrome/app_chrome/Default/History"
+REMOTE_HISTORY_FILE = os.getenv("REMOTE_HISTORY_FILE")
+TEMP_HISTORY_FILE = os.getenv("TEMP_HISTORY_FILE")
 LOCAL_HISTORY_FILE = os.path.join(OUTPUT_DIR, "History.db")
 
 @app.get("/", response_class=HTMLResponse)
