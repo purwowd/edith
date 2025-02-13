@@ -58,6 +58,12 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="#" class="nav-link" onclick="showCallLogs()">
+              <i class="nav-icon fas fa-phone"></i>
+              <p>Call Logs</p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="#" class="nav-link" onclick="showBrowserHistory()">
               <i class="nav-icon fas fa-history"></i>
               <p>Browser History</p>
@@ -65,8 +71,8 @@
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link" onclick="searchContact()">
-              <i class="nav-icon fas fa-search"></i>
-              <p>Search Contact</p>
+              <i class="nav-icon fas fa-house-user"></i>
+              <p>Find Family Members</p>
             </a>
           </li>
           </li>
@@ -213,6 +219,47 @@ async function showContacts() {
   document.getElementById('main-content').innerHTML = content;
 }
 
+async function showCallLogs() {
+  document.getElementById('content-title').textContent = 'Call Logs';
+
+  const data = await fetchData('/call-logs');
+  if (!data || data.length === 0) {
+    document.getElementById('main-content').innerHTML = '<p>No call log data available.</p>';
+    return;
+  }
+
+  const content = `
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Number</th>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Duration</th>
+          <th>Name</th>
+          <th>Normalized Number</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(log => `
+          <tr>
+            <td>${log[0]}</td>
+            <td>${log[2]}</td>
+            <td>${log[3]}</td>
+            <td>${log[5] === 1 ? 'Incoming' : log[2] === 2 ? 'Outgoing' : 'Missed'}</td>
+            <td>${log[4]}</td>
+            <td>${log[6] || '-'}</td>
+            <td>${log[7] || '-'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+
+  document.getElementById('main-content').innerHTML = content;
+}
+
 async function showSMS() {
     document.getElementById('content-title').textContent = 'SMS Messages';
     
@@ -238,7 +285,7 @@ async function showSMS() {
           ${data.map(sms => `
             <tr>
               <td>${sms.address}</td>
-              <td>${new Date(sms.date).toLocaleString()}</td>
+              <td>${sms.date}</td>
               <td>${sms.body}</td>
               <td>${sms.type === 1 ? 'Inbox' : sms.type === 2 ? 'Sent' : 'Other'}</td>
             </tr>
@@ -268,9 +315,9 @@ async function showBrowserHistory() {
       <tbody>
         ${data.map(history => `
           <tr>
-            <td>${history[2]}</td>
-            <td>${history[1]}</td>
-            <td>${new Date(history[3]).toLocaleString()}</td>
+            <td>${history.title}</td>
+            <td>${history.url}</td>
+            <td>${history.last_visit_time}</td>
           </tr>
         `).join('')}
       </tbody>
@@ -279,6 +326,7 @@ async function showBrowserHistory() {
   
   document.getElementById('main-content').innerHTML = content;
 }
+
 
 async function searchContact() {
     document.getElementById('content-title').textContent = 'Search Results';
