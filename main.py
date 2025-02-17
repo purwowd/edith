@@ -57,7 +57,7 @@ def run_adb_command(command):
         raise HTTPException(status_code=500, detail=f"ADB command failed: {e.stderr}")
 
 def create_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.getenv('DB_PATH'))
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS device_info (
@@ -137,7 +137,7 @@ def save_call_logs():
             "shell", "content", "query", "--uri", "content://call_log/calls"
         ])
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(os.getenv('DB_PATH'))
         cursor = conn.cursor()
 
         for line in call_logs_output.splitlines():
@@ -176,7 +176,7 @@ def save_call_logs():
         raise HTTPException(status_code=500, detail=f"Failed to save Call Logs data: {str(e)}")
 
 def save_contacts_and_sms():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.getenv('DB_PATH'))
     cursor = conn.cursor()
     try:
         contacts_output = run_adb_command(["shell", "content", "query", "--uri", "content://contacts/phones"])
@@ -202,7 +202,7 @@ def save_sms():
         
         logging.info(f"SMS Output: {sms_output}")  # Logging output ADB
         
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(os.getenv('DB_PATH'))
         cursor = conn.cursor()
         
         for line in sms_output.splitlines():
@@ -253,9 +253,9 @@ def pull_browser_history():
         logging.info("Cleaning up temporary file...")
         run_adb_command(["shell", "su", "-c", f"rm {TEMP_HISTORY_FILE}"])
         
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(os.getenv('DB_PATH'))
         cursor = conn.cursor()
-        history_conn = sqlite3.connect(LOCAL_HISTORY_FILE)
+        history_conn = sqlite3.connect(os.getenv('LOCAL_HISTORY_FILE'))
         history_cursor = history_conn.cursor()
         
         history_cursor.execute("SELECT url, title, last_visit_time FROM urls")
@@ -281,7 +281,7 @@ async def pull_all_data(request: Request):
 
 @app.get("/most-contacted")
 async def most_contacts(request: Request):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.getenv('DB_PATH'))
     cursor = conn.cursor()
     try:
         cursor.execute("""
@@ -343,7 +343,7 @@ def translate_timestamp(last_visit_time):
 
 @app.get("/browser-history")
 async def get_browser_history(request: Request):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.getenv('DB_PATH'))
     cursor = conn.cursor()
     cursor.execute("SELECT id, url, title, last_visit_time FROM browser_history")
     data = cursor.fetchall()
@@ -364,7 +364,7 @@ async def get_browser_history(request: Request):
 
 @app.get("/contacts")
 async def get_contacts(request: Request):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.getenv('DB_PATH'))
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM contacts")
     data = cursor.fetchall()
@@ -373,7 +373,7 @@ async def get_contacts(request: Request):
 
 @app.get("/sms")
 async def get_sms(request: Request):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.getenv('DB_PATH'))
     cursor = conn.cursor()
     cursor.execute("SELECT id, address, body, date, type FROM sms")
     rows = cursor.fetchall()
@@ -393,7 +393,7 @@ async def get_sms(request: Request):
 
 @app.get("/device-info")
 async def get_device_info(request: Request):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.getenv('DB_PATH'))
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM device_info")
     data = cursor.fetchall()
@@ -421,7 +421,7 @@ async def search_contact(request: Request):
         wordlist = load_wordlist()
         
         # Buka koneksi ke database
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(os.getenv('DB_PATH'))
         cursor = conn.cursor()
         
         results = []
@@ -448,10 +448,9 @@ async def search_contact(request: Request):
     
 @app.get("/call-logs")
 async def get_call_logs(request: Request):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.getenv('DB_PATH'))
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM call_logs")
     data = cursor.fetchall()
     conn.close()
     return data
-
