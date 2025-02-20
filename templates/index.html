@@ -242,8 +242,9 @@ async function showContacts() {
   document.getElementById('content-title').textContent = 'Contacts';
   const data = await fetchData('/contacts');
   if (!data) return;
-  
+
   const content = `
+    <input type="text" id="searchContact" class="form-control mb-2" placeholder="Search contacts...">
     <table class="table table-bordered table-striped">
       <thead>
         <tr>
@@ -252,7 +253,7 @@ async function showContacts() {
           <th>Times Contacted</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="contactsTable">
         ${data.map(contact => `
           <tr>
             <td>${contact[1]}</td>
@@ -265,19 +266,36 @@ async function showContacts() {
   `;
   
   document.getElementById('main-content').innerHTML = content;
-}
 
+  document.getElementById('searchContact').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#contactsTable tr');
+    
+    rows.forEach(row => {
+      const name = row.cells[0].textContent.toLowerCase();
+      const number = row.cells[1].textContent.toLowerCase();
+      if (name.includes(searchValue) || number.includes(searchValue)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+}
 async function showCallLogs() {
   document.getElementById('content-title').textContent = 'Call Logs';
 
   const data = await fetchData('/call-logs');
   if (!data || data.length === 0) {
-    document.getElementById('main-content').innerHTML = '<p>No call log data available.</p>';
-    return;
+      document.getElementById('main-content').innerHTML = '<p>No call log data available.</p>';
+      return;
   }
 
   const content = `
-    <table class="table table-bordered table-striped">
+    <div class="mb-3">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search..." onkeyup="filterCallLogs()">
+    </div>
+    <table class="table table-bordered table-striped" id="callLogsTable">
       <thead>
         <tr>
           <th>ID</th>
@@ -293,58 +311,98 @@ async function showCallLogs() {
         ${data.map(log => `
           <tr>
             <td>${log[0]}</td>
-            <td>${log[2]}</td>
+            <td>${log[1]}</td>
+            <td>${log[2] ? new Date(log[2]).toLocaleString() : '-'}</td>
+            <td>
+              ${log[4] === 1 ? 'Incoming' : 
+                log[4] === 2 ? 'Outgoing' : 
+                log[4] === 3 ? 'Missed' : 
+                log[4] === 5 ? 'Rejected' : 
+                log[4] === 6 ? 'Blocked' : 'Unknown'}
+            </td>            
             <td>${log[3]}</td>
-            <td>${log[5] === 1 ? 'Incoming' : log[2] === 2 ? 'Outgoing' : 'Missed'}</td>
-            <td>${log[4]}</td>
-            <td>${log[6] || '-'}</td>
-            <td>${log[7] || '-'}</td>
+            <td>${log[5]}</td>
+            <td>${log[6]}</td>
           </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-
-  document.getElementById('main-content').innerHTML = content;
-}
-
-async function showSMS() {
-    document.getElementById('content-title').textContent = 'SMS Messages';
-    
-    // Fetch data dari endpoint /sms
-    const data = await fetchData('/sms');
-    if (!data || data.length === 0) {
-      document.getElementById('main-content').innerHTML = '<p>No SMS data available.</p>';
-      return;
-    }
-    
-    // Generate tabel HTML dari data SMS
-    const content = `
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>Address</th>
-            <th>Date</th>
-            <th>Message</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${data.map(sms => `
-            <tr>
-              <td>${sms.address}</td>
-              <td>${sms.date}</td>
-              <td>${sms.body}</td>
-              <td>${sms.type === 1 ? 'Inbox' : sms.type === 2 ? 'Sent' : 'Other'}</td>
-            </tr>
           `).join('')}
         </tbody>
       </table>
     `;
-    
-    // Tampilkan tabel di elemen main-content
-    document.getElementById('main-content').innerHTML = content;
+
+  document.getElementById('main-content').innerHTML = content;
+}
+
+function filterCallLogs() {
+  const input = document.getElementById('searchInput').value.toLowerCase();
+  const table = document.getElementById('callLogsTable');
+  const rows = table.getElementsByTagName('tr');
+
+  for (let i = 1; i < rows.length; i++) {
+      const cells = rows[i].getElementsByTagName('td');
+      let rowMatch = false;
+
+      if (cells.length > 0) {
+          for (let j = 0; j < cells.length; j++) {
+              if (cells[j].textContent.toLowerCase().includes(input)) {
+                  rowMatch = true;
+                  break;
+              }
+          }
+      }
+
+      rows[i].style.display = rowMatch ? '' : 'none';
   }
+}
+
+async function showSMS() {
+  document.getElementById('content-title').textContent = 'SMS Messages';
+
+  const data = await fetchData('/sms');
+  if (!data || data.length === 0) {
+      document.getElementById('main-content').innerHTML = '<p>No SMS data available.</p>';
+      return;
+  }
+
+  const content = `
+    <input type="text" id="smsSearch" class="form-control mb-3" placeholder="Search SMS...">
+    <table class="table table-bordered table-striped" id="smsTable">
+      <thead>
+        <tr>
+          <th>Address</th>
+          <th>Date</th>
+          <th>Message</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(sms => `
+          <tr>
+            <td>${sms.address}</td>
+            <td>${sms.date ? new Date(sms.date).toLocaleString() : '-'}</td>
+            <td>${sms.body}</td>
+            <td>${sms.type === 1 ? 'Inbox' : sms.type === 2 ? 'Sent' : 'Other'}</td>
+          </tr>
+        `).join('')}
+      </tbody>  
+    </table>
+  `;
+
+  document.getElementById('main-content').innerHTML = content;
+
+  // Tambahkan event listener untuk pencarian
+  document.getElementById('smsSearch').addEventListener('keyup', function() {
+      let filter = this.value.toLowerCase();
+      let rows = document.querySelectorAll('#smsTable tbody tr');
+      
+      rows.forEach(row => {
+          let text = row.textContent.toLowerCase();
+          row.style.display = text.includes(filter) ? '' : 'none';
+      });
+  });
+}
+
+// Fungsi filter/search SMS berdasarkan input
+
   
 async function showBrowserHistory() {
   document.getElementById('content-title').textContent = 'Browser History';
@@ -365,7 +423,7 @@ async function showBrowserHistory() {
           <tr>
             <td>${history.title}</td>
             <td>${history.url}</td>
-            <td>${history.last_visit_time}</td>
+            <td>${history.last_visit_time ? new Date(history.last_visit_time).toLocaleString() : '-'}</td>
           </tr>
         `).join('')}
       </tbody>
@@ -377,38 +435,48 @@ async function showBrowserHistory() {
 
 
 async function searchContact() {
-    document.getElementById('content-title').textContent = 'Search Results';
-    
-    // Fetch data dari endpoint /search-contact
-    const data = await fetchData('/search-contact');
-    if (!data || data.length === 0) {
-      document.getElementById('main-content').innerHTML = '<p>No matching contacts found.</p>';
-      return;
-    }
-    
-    // Generate tabel HTML dari data kontak
-    const content = `
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Number</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${data.map(contact => `
-            <tr>
-              <td>${contact.name}</td>
-              <td>${contact.number}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    `;
-    
-    // Tampilkan tabel di elemen main-content
-    document.getElementById('main-content').innerHTML = content;
+  document.getElementById('content-title').textContent = 'Search Results';
+  
+  // Fetch data dari endpoint /search-contact
+  const data = await fetchData('/search-contact');
+  if (!data || data.length === 0) {
+    document.getElementById('main-content').innerHTML = '<p>No matching contacts found.</p>';
+    return;
   }
+  
+  // Generate tabel HTML dari data kontak
+  const content = `
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>JID</th>
+          <th>Name</th>
+          <th>Number</th>
+          <th>Raw Contact ID</th>
+          <th>Display Name</th>
+          <th>Given Name</th>
+          <th>WA Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(contact => `
+          <tr>
+            <td>${contact.jid || '-'}</td>
+            <td>${contact.name || '-'}</td>
+            <td>${contact.number || '-'}</td>
+            <td>${contact.raw_contact_id || '-'}</td>
+            <td>${contact.display_name || '-'}</td>
+            <td>${contact.given_name || '-'}</td>
+            <td>${contact.wa_name || '-'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  
+  // Tampilkan tabel di elemen main-content
+  document.getElementById('main-content').innerHTML = content;
+}
 
   async function fetchMostContacts() {
     document.getElementById('content-title').textContent = 'Most Frequent Contacts';
@@ -478,7 +546,7 @@ async function showWaContacts() {
           <tr>
             <th>WhatsApp ID</th>
             <th>Number</th>
-            <th>Times Contacted</th>
+            <th>Contact ID</th>
             <th>Display Name</th>
             <th>Given Name</th>
             <th>WA Name Original</th>
@@ -508,12 +576,15 @@ async function showWaContacts() {
 
 async function ShowWaMessages() {
   document.getElementById('content-title').textContent = 'WhatsApp Messages';
-  
+
   const data = await fetchData('/wa-msg');
   if (!data) return;
-  
+
   const content = `
-    <table class="table table-bordered table-striped">
+    <div class="mb-3">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search messages..." onkeyup="filterTable()">
+    </div>
+    <table id="waTable" class="table table-bordered table-striped">
       <thead>
         <tr>
           <th>ID</th>
@@ -542,9 +613,21 @@ async function ShowWaMessages() {
       </tbody>
     </table>
   `;
-  
+
   document.getElementById('main-content').innerHTML = content;
 }
+
+// Fungsi untuk memfilter tabel berdasarkan input search
+function filterTable() {
+  const input = document.getElementById('searchInput').value.toLowerCase();
+  const rows = document.querySelectorAll("#waTable tbody tr");
+
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(input) ? "" : "none";
+  });
+}
+
 </script>
 </body>
 </html>

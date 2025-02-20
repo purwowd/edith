@@ -25,32 +25,49 @@ def load_wordlist():
     
 def search_contact():
     try:
-        # Load wordlist dari file
         wordlist = load_wordlist()
-        
-        # Buka koneksi ke database
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
         results = []
-        seen_numbers = set()  # Set untuk menyimpan nomor yang sudah ditambahkan
+        seen_numbers = set()
         
         for word in wordlist:
-            # Query untuk mencari nama kontak yang cocok secara case-insensitive
-            cursor.execute("SELECT name, number FROM contacts WHERE LOWER(name) = ?", (word.lower(),))
+            word_lower = word.lower()
+            
+            # Cari di tabel contacts
+            cursor.execute("""
+                SELECT name, number FROM contacts WHERE LOWER(name) = ?
+            """, (word_lower,))
             matches = cursor.fetchall()
             
-            # Tambahkan hasil ke daftar jika nomor belum ada
             for match in matches:
-                if match[1] not in seen_numbers:  
+                if match[1] not in seen_numbers:
                     results.append({"name": match[0], "number": match[1]})
-                    seen_numbers.add(match[1])  # Tandai nomor sebagai sudah dimasukkan
+                    seen_numbers.add(match[1])
+            
+            # Cari di tabel wa_contact
+            cursor.execute("""
+                SELECT jid, number, raw_contact_id, display_name, given_name, wa_name 
+                FROM wa_contact 
+                WHERE LOWER(display_name) = ? OR LOWER(given_name) = ? OR LOWER(wa_name) = ?
+            """, (word_lower, word_lower, word_lower))
+            matches = cursor.fetchall()
+            
+            for match in matches:
+                if match[1] not in seen_numbers:
+                    results.append({
+                        "jid": match[0],
+                        "number": match[1],
+                        "raw_contact_id": match[2],
+                        "display_name": match[3],
+                        "given_name": match[4],
+                        "wa_name": match[5],
+                    })
+                    seen_numbers.add(match[1])
         
-        # Tutup koneksi database
         conn.close()
-        
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error searching contacts: {str(e)}")
-
     

@@ -28,9 +28,21 @@ templates = Jinja2Templates(directory=templates_dir)
 
 # Include router dari pull-all API
 from app.api.PullAll import router as pullall_router
-
-
 app.include_router(pullall_router)
+from app.api.sms import router as sms_router
+app.include_router(sms_router)
+from app.api.contact import router as contact_router
+app.include_router(contact_router)
+from app.api.browserhistory import router as bhistory_router
+app.include_router(bhistory_router)
+from app.api.call_logs import router as call_logs_router
+app.include_router(call_logs_router)
+from app.api.deviceinfo import router as deviceinfo_router
+app.include_router(deviceinfo_router)
+from app.api.wa import router as wa_router
+app.include_router(wa_router)
+
+
 
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):

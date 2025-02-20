@@ -3,6 +3,7 @@
 import os
 import sqlite3
 from app.service.PullAll_service import DB_PATH
+from app.service.browserhistory import translate_timestamp
 def get_db_path():
     # Pastikan environment OUTPUT_DIR sudah didefinisikan, jika tidak gunakan "./" sebagai default
     output_dir = os.getenv("OUTPUT_DIR", "./")
