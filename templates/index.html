@@ -28,17 +28,35 @@
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
           <li class="nav-item">
-            <a href="#" class="nav-link" onclick="pullAllData()">
+            <a href="#" class="nav-link" onclick="toggleMenu2(event)">
               <i class="nav-icon fas fa-sync"></i>
-              <p>Pull All Data</p>
+              <p>
+                Pull Data
+                <i class="right fas fa-angle-left"></i>
+              </p>
             </a>
+            <ul class="nav nav-treeview" id="PullDataMenu" style="display: none;">
+              <li class="nav-item">
+                <a href="#" class="nav-link" onclick="pullAllData()">
+                  <i class="fas fa-sync nav-icon"></i>
+                  <p>Pull All Data</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" onclick="pullRootedData()">
+                  <i class="fas fa-sync nav-icon"></i>
+                  <p>Pull All Data (root)</p>
+                </a>
+              </li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link" onclick="pullRootedData()">
-              <i class="nav-icon fas fa-sync-alt"></i>
-              <p>Pull All (Rooted)</p>
-            </a>
-          </li>
+          <script>
+            function toggleMenu2(event) {
+              event.preventDefault();
+              let menu = document.getElementById("PullDataMenu");
+              menu.style.display = menu.style.display === "none" ? "block" : "none";
+            }
+          </script> 
           <li class="nav-item">
             <a href="#" class="nav-link" onclick="showDeviceInfo()">
               <i class="nav-icon fas fa-mobile-alt"></i>
@@ -82,6 +100,36 @@
               <p>Most Contacts</p>
             </a>
           </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" onclick="toggleMenu(event)">
+              <i class="nav-icon fas fa-comments"></i>
+              <p>
+                Get WhatsApp Data
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview" id="whatsappMenu" style="display: none;">
+              <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showWaContacts()">
+                  <i class="fas fa-address-book nav-icon"></i>
+                  <p>Get WhatsApp Contact</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" onclick="ShowWaMessages()">
+                  <i class="fas fa-comments nav-icon"></i>
+                  <p>Get WA Messages</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <script>
+            function toggleMenu(event) {
+              event.preventDefault();
+              let menu = document.getElementById("whatsappMenu");
+              menu.style.display = menu.style.display === "none" ? "block" : "none";
+            }
+          </script>          
         </ul>
       </nav>
     </div>
@@ -411,6 +459,88 @@ async function showMostContacted() {
         <span class="info-box-text">Times Contacted: ${data.times_contacted}</span>
       </div>
     </div>
+  `;
+  
+  document.getElementById('main-content').innerHTML = content;
+}
+
+async function showWaContacts() {
+  document.getElementById('content-title').textContent = 'WhatsApp Contacts';
+  
+  try {
+    const response = await fetch('/get-wa-contacts');
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error('Invalid data format');
+    
+    const content = `
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>WhatsApp ID</th>
+            <th>Number</th>
+            <th>Times Contacted</th>
+            <th>Display Name</th>
+            <th>Given Name</th>
+            <th>WA Name Original</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(contact => `
+            <tr>
+              <td>${contact[0]}</td>
+              <td>${contact[1]}</td>
+              <td>${contact[2]}</td>
+              <td>${contact[3] || '-'}</td>
+              <td>${contact[4] || '-'}</td>
+              <td>${contact[5] || '-'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+    
+    document.getElementById('main-content').innerHTML = content;
+  } catch (error) {
+    console.error('Error fetching contacts:', error);
+    document.getElementById('main-content').innerHTML = '<p class="text-danger">Failed to load contacts.</p>';
+  }
+}
+
+async function ShowWaMessages() {
+  document.getElementById('content-title').textContent = 'WhatsApp Messages';
+  
+  const data = await fetchData('/wa-msg');
+  if (!data) return;
+  
+  const content = `
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Type</th>
+          <th>Message ID</th>
+          <th>Timestamp</th>
+          <th>Received At</th>
+          <th>Read At</th>
+          <th>Message</th>
+          <th>Index</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(msg => `
+          <tr>
+            <td>${msg[0]}</td>
+            <td>${msg[1]}</td>
+            <td>${msg[2]}</td>
+            <td>${msg[3] ? new Date(msg[3]).toLocaleString() : '-'}</td>
+            <td>${msg[4] ? new Date(msg[4]).toLocaleString() : '-'}</td>
+            <td>${msg[5] ? new Date(msg[5]).toLocaleString() : '-'}</td>
+            <td>${msg[6] ? msg[6] : '-'}</td>
+            <td>${msg[7]}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
   `;
   
   document.getElementById('main-content').innerHTML = content;

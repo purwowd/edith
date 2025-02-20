@@ -9,6 +9,7 @@ from app.service.most_contacts import most_contacts
 from app.service.call_logs import get_call_logs
 from app.service.deviceinfo import get_device_info
 from app.service.searchcontact import search_contact
+from app.service.wa import wa_contacts, msg_jid, msg_message
 router = APIRouter()
 
 @router.get("/pull-all")
@@ -46,4 +47,17 @@ async def device_info_endpoint (request: Request):
 @router.get("/search-contact")
 async def search_contact_endpoint (request: Request):
     return search_contact()
+
+@router.get("/get-wa-contacts")
+async def get_wacontact_endpoint (request: Request):
+    return wa_contacts()
+
+@router.get("/get-wa-jid")
+async def get_wacontact_endpoint (request: Request):
+    return msg_jid()
+
+@router.get("/wa-msg")
+async def get_msgwa_endpoint (request: Request):
+    return msg_message()
+
 
