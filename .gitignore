@@ -5,7 +5,13 @@ __pycache__/
 
 # C extensions
 *.so
-
+.env
+venv/
+.gitignore
+.dockerignore
+.device_data.db
+output/
+static/
 # Distribution / packaging
 .Python
 build/
