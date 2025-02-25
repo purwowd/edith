@@ -28,7 +28,7 @@ def get_browser_history():
             "id": row[0],
             "url": row[1],
             "title": row[2],
-            "last_visit_time": translate_timestamp(row[3])
+            "last_visit_time": row[3]
         }
         for row in data
     ]

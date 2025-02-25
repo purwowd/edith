@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request
-from app.service.wa import wa_contacts, msg_jid, msg_message
+from app.service.wa import wa_contacts, msg_jid
+from app.service.wamessage import msg_messages, view_combined_json
 router = APIRouter()
 
 
@@ -13,4 +14,5 @@ async def get_wacontact_endpoint (request: Request):
 
 @router.get("/wa-msg")
 async def get_msgwa_endpoint (request: Request):
-    return msg_message()
+    return view_combined_json()
+

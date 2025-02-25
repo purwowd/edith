@@ -44,6 +44,7 @@ app.include_router(wa_router)
 
 
 
+
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})

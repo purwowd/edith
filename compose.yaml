@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  fastapi_app:
+    build: .
+    container_name: fastapi_app
+    # Memuat environment variables dari file .env jika dibutuhkan
+    env_file:
+      - .env
+    # Mapping port 8000 di host ke 8000 di container
+    ports:
+      - "8000:8000"
+    # Opsional: mount seluruh folder proyek ke /app (untuk memudahkan pengembangan)
+    volumes:
+      - .:/app
+    # Dibutuhkan agar kontainer dapat mengakses device USB untuk ADB
+    privileged: true
+    devices:
+      - "/dev/bus/usb:/dev/bus/usb"
+
+      

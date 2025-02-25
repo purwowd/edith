@@ -4,6 +4,8 @@ import logging
 from fastapi import HTTPException
 from dotenv import load_dotenv
 from app.service.PullAll_service import DB_PATH
+import subprocess
+import shutil
 
 load_dotenv()
 def get_db_path():
@@ -28,14 +30,4 @@ def msg_jid():
     data = cursor.fetchall()
     conn.close()
     return data
-
-def msg_message():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM msg_message")
-    data = cursor.fetchall()
-    conn.close()
-    return data
-
-
 

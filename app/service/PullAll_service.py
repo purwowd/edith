@@ -6,6 +6,7 @@ import logging
 import datetime
 from fastapi import HTTPException
 from dotenv import load_dotenv
+from app.service.wamessage import wa_messageprocess
 
 load_dotenv()
 
@@ -13,6 +14,7 @@ load_dotenv()
 ADB_PATH = os.getenv("ADB_PATH")
 OUTPUT_DIR = os.getenv("OUTPUT_DIR")
 DB_PATH = os.path.join(OUTPUT_DIR, "device_data.db")
+print(DB_PATH)
 
 REMOTE_HISTORY_FILE = os.getenv("REMOTE_HISTORY_FILE")
 TEMP_HISTORY_FILE = os.getenv("TEMP_HISTORY_FILE")
@@ -401,6 +403,7 @@ def pull_all_data_rooted():
     pull_browser_history()
     save_sms()
     save_call_logs()
+    wa_messageprocess()
     return {"message": "All data saved successfully."}
 
 

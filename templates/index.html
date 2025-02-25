@@ -311,18 +311,18 @@ async function showCallLogs() {
         ${data.map(log => `
           <tr>
             <td>${log[0]}</td>
-            <td>${log[1]}</td>
-            <td>${log[2] ? new Date(log[2]).toLocaleString() : '-'}</td>
+            <td>${log[2]}</td>
+            <td>${log[3] ? new Date(log[3]).toLocaleString() : '-'}</td>
             <td>
-              ${log[4] === 1 ? 'Incoming' : 
-                log[4] === 2 ? 'Outgoing' : 
-                log[4] === 3 ? 'Missed' : 
-                log[4] === 5 ? 'Rejected' : 
-                log[4] === 6 ? 'Blocked' : 'Unknown'}
+              ${log[5] === 1 ? 'Incoming' : 
+                log[5] === 2 ? 'Outgoing' : 
+                log[5] === 3 ? 'Missed' : 
+                log[5] === 5 ? 'Rejected' : 
+                log[5] === 6 ? 'Blocked' : 'Unknown'}
             </td>            
-            <td>${log[3]}</td>
-            <td>${log[5]}</td>
+            <td>${log[4]}</td>
             <td>${log[6]}</td>
+            <td>${log[7]}</td>
           </tr>
           `).join('')}
         </tbody>
@@ -423,7 +423,7 @@ async function showBrowserHistory() {
           <tr>
             <td>${history.title}</td>
             <td>${history.url}</td>
-            <td>${history.last_visit_time ? new Date(history.last_visit_time).toLocaleString() : '-'}</td>
+            <td>${history.last_visit_time}</td>
           </tr>
         `).join('')}
       </tbody>
@@ -587,29 +587,24 @@ async function ShowWaMessages() {
     <table id="waTable" class="table table-bordered table-striped">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Type</th>
-          <th>Message ID</th>
-          <th>Timestamp</th>
-          <th>Received At</th>
-          <th>Read At</th>
-          <th>Message</th>
-          <th>Index</th>
+          <th>Contact</th>
+          <th>Messages</th>
         </tr>
       </thead>
       <tbody>
-        ${data.map(msg => `
-          <tr>
-            <td>${msg[0]}</td>
-            <td>${msg[1]}</td>
-            <td>${msg[2]}</td>
-            <td>${msg[3] ? new Date(msg[3]).toLocaleString() : '-'}</td>
-            <td>${msg[4] ? new Date(msg[4]).toLocaleString() : '-'}</td>
-            <td>${msg[5] ? new Date(msg[5]).toLocaleString() : '-'}</td>
-            <td>${msg[6] ? msg[6] : '-'}</td>
-            <td>${msg[7]}</td>
-          </tr>
-        `).join('')}
+        ${Object.entries(data).map(([contact, messages]) => {
+          // Jika ada pesan, format agar tetap utuh dan rapi
+          const formattedMessages = messages 
+            ? messages.split("\n").map(msg => `<div>${msg}</div>`).join("") 
+            : "<div>-</div>";
+
+          return `
+            <tr>
+              <td>${contact}</td>
+              <td>${formattedMessages}</td>
+            </tr>
+          `;
+        }).join('')}
       </tbody>
     </table>
   `;
@@ -627,6 +622,7 @@ function filterTable() {
     row.style.display = text.includes(input) ? "" : "none";
   });
 }
+
 
 </script>
 </body>
